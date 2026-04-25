@@ -71,6 +71,8 @@
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
     "@types/react": "19.1.15",
+    "babel-plugin-react-compiler": "^1.0.0",
+    "baseline-browser-mapping": "^2.10.21",
     "eslint": "^9",
     "eslint-config-next": "15.5.4",
     "prisma": "^6.19.3",
