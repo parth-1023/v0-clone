@@ -5,7 +5,7 @@ import db from "@/lib/db";
 import { MessageRole, MessageType } from "@prisma/client";
 import { generateSlug } from "random-word-slugs";
 import { getCurrentUser } from "@/modules/auth/actions";
-// import { consumeCredits } from "@/lib/usage";
+import { consumeCredits } from "@/lib/usage";
 
 export const getProjects = async () => {
     const user = await getCurrentUser();
@@ -30,17 +30,16 @@ export const createProject = async (value) => {
     try {
         await consumeCredits();
     } catch (error) {
-        if (error instanceof Error) {
-            throw new Error({
-                code: "BAD_REQUEST",
-                message: "Something went wrong",
-            });
-        } else {
-            throw new Error({
-                code: "TOO_MANY_REQUESTS",
-                message: "Too many requests",
-            });
+        if (error instanceof Error && error.message === "Unauthorized") {
+            throw new Error("Unauthorized");
         }
+        
+        // Check if it's a rate limit error (rate-limiter-flexible throws when points are exhausted)
+        if (error?.remainingPoints === 0 || (error instanceof Error && error.message.includes("points"))) {
+             throw new Error("Insufficient credits. Please upgrade your plan.");
+        }
+
+        throw new Error("Something went wrong while consuming credits.");
     }
 
     const newProject = await db.project.create({

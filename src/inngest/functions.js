@@ -65,7 +65,7 @@ export const codeAgentFunction = inngest.createFunction(
       name: "code-agent",
       description: "An expert coding agent",
       system: PROMPT,
-      model: gemini({ model: "gemini-2.5-flash" }),
+      model: gemini({ model: "gemini-2.5-flash-lite" }),
       tools: [
         createTool({
           name: "terminal",
@@ -180,7 +180,7 @@ export const codeAgentFunction = inngest.createFunction(
     const network = createNetwork({
       name: "coding-agent-network",
       agents: [codeAgent],
-      maxIter: 10,
+      maxIter: 5,
       defaultState: state,
       router: async ({ network }) => {
         const summary = network.state.data.summary;
@@ -198,14 +198,14 @@ export const codeAgentFunction = inngest.createFunction(
       name: "fragment-title-generator",
       description: "Generate a title for the fragment",
       system: FRAGMENT_TITLE_PROMPT,
-      model: gemini({ model: "gemini-2.5-flash" }),
+      model: gemini({ model: "gemini-2.5-flash-lite" }),
     });
 
     const responseGenerator = createAgent({
       name: "response-generator",
       description: "Generate a response for the fragment",
       system: RESPONSE_PROMPT,
-      model: gemini({ model: "gemini-2.5-flash" }),
+      model: gemini({ model: "gemini-2.5-flash-lite" }),
     });
 
     const { output: fragmentTitleOutput } = await fragmentTitleGenerator.run(
@@ -281,10 +281,7 @@ export const codeAgentFunction = inngest.createFunction(
 
     return {
       url: sandboxUrl,
-      title:
-        fragmentTitle[0].type === "text"
-          ? fragmentTitle[0].content
-          : "Fragment",
+      title: generateFragmentTitle(),
       files: result.state.data.files,
       summary: result.state.data.summary,
     };
